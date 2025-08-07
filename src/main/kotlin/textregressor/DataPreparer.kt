@@ -9,9 +9,9 @@ object DataPreparer {
       return vocab.map { if (it in words) 1.0 else 0.0 }.toDoubleArray()
    }
 
-   fun prepareDataset(examples: Map<String, Double>, vocab: List<String>): DataSet {
+   fun prepareDataset(examples: Examples, vocab: List<String>): DataSet {
       val inputs = examples.keys.map { vectorize(it, vocab) }
-      val labels = examples.values.map { doubleArrayOf(it) }
+      val labels = examples.values.map { doubleArrayOf(it.toDouble()) }
       val inputND = Nd4j.create(inputs.toTypedArray())
       val labelND = Nd4j.create(labels.toTypedArray())
       return DataSet(inputND, labelND)

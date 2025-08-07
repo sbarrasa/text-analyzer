@@ -1,33 +1,49 @@
+package textregressor.usecases
+
+import textregressor.Examples
 import textregressor.TextRegressor
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-class OpinionScoringTest {
+class PredictUserReviewScoreTest {
+
+   private val trainingData: Examples = mapOf(
+      "excelente producto me encantó" to 5,
+      "muy bueno y rápido" to 3,
+      "me gustó bastante recomendable" to 2,
+      "aceptable aunque algo lento" to 0.5,
+      "ni bueno ni malo regular" to 0,
+      "me decepcionó esperaba más" to -2,
+      "malo no lo recomiendo" to -3,
+      "pésimo experiencia horrible" to -6,
+      "fue una compra buena" to 1,
+      "no me convenció del todo" to -1,
+      "desastre de producto" to -5
+   )
 
    @Test
-   fun `detecta grado de positividad y negatividad`() {
-      val model = TextRegressor()
-      val training = mapOf(
-         "horrible experiencia" to -5.0,
-         "muy malo" to -4.0,
-         "no me gustó" to -2.0,
-         "es aceptable" to 0.0,
-         "me gustó bastante" to 2.5,
-         "muy bueno" to 4.0,
-         "excelente, lo recomiendo" to 5.0
-      )
-      model.train(training)
+   fun neutralPositiveReviewTest() {
+      val regressor = TextRegressor(epochs = 1000, learningRate = 0.01, hiddenSize = 8)
+      regressor.train(trainingData)
 
-      val resultPos = model.analyze("excelente producto, muy bueno")
-      val resultNeg = model.analyze("malo, no me gustó")
-      val resultNeutral = model.analyze("aceptable")
+      val testText = "el producto llegó rápido y funciona bien pero esperaba mejor calidad"
+      val prediction = regressor.analyze(testText)
 
-      println("Positivo: $resultPos")
-      println("Negativo: $resultNeg")
-      println("Neutro: $resultNeutral")
+      println("Predicción para: \"$testText\" -> $prediction")
 
-      assertTrue(resultPos > 3.0)
-      assertTrue(resultNeg < -1.0)
-      assertTrue(resultNeutral in -1.0..1.0)
+      assertTrue(prediction in 0.0..1.0)
+   }
+
+   @Test
+   fun badReviewTest() {
+      val regressor = TextRegressor(epochs = 300, learningRate = 0.01, hiddenSize = 8)
+      regressor.train(trainingData)
+
+      val testText = "El producto fue un desastre. Jamás volvería a tener una experiencia tan horrible como esta "
+      val prediction = regressor.analyze(testText)
+
+      println("Predicción para: \"$testText\" -> $prediction")
+
+      assertTrue(prediction in -5.0..-3.0)
    }
 }
