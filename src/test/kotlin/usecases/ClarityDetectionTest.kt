@@ -1,7 +1,7 @@
 package textregressor.usecases
 
 import com.sbarrasa.textregressor.TrainingSet
-import com.sbarrasa.textregressor.UseCaseTest
+import textregressor.com.sbarrasa.textregressor.UseCaseTest
 import kotlin.test.Test
 
 

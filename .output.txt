@@ -1,0 +1,470 @@
+warning: in the working copy of 'build.gradle.kts', LF will be replaced by CRLF the next time Git touches it
+diff --git a/build.gradle.kts b/build.gradle.kts
+index b253f46..51cc6a9 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -21,7 +21,7 @@ dependencies {
+    implementation(kotlin("test"))
+ }
+
+-   tasks.test {
++tasks.test {
+    useJUnitPlatform()
+ }
+ kotlin {
+diff --git a/src/main/kotlin/com/sbarrasa/textregressor/RegressionModelAdapter.kt b/src/main/kotlin/com/sbarrasa/textregressor/RegressionModelAdapter.kt
+index 5ef9a3d..b787ac0 100644
+--- a/src/main/kotlin/com/sbarrasa/textregressor/RegressionModelAdapter.kt
++++ b/src/main/kotlin/com/sbarrasa/textregressor/RegressionModelAdapter.kt
+@@ -3,56 +3,56 @@ package com.sbarrasa.textregressor
+ import kotlin.math.sqrt
+
+ class RegressionModelAdapter {
+-    private lateinit var trainingFeatures: Array<DoubleArray>
+-    private lateinit var trainingTargets: DoubleArray
+-    var isTrained = false
+-
+-    fun train(features: Array<DoubleArray>, targets: DoubleArray) {
+-        trainingFeatures = features
+-        trainingTargets = targets
+-        isTrained = true
+-    }
+-
+-    fun predict(features: DoubleArray): Double {
+-        if (!isTrained) throw IllegalStateException("Model not trained")
+-        if (trainingFeatures.isEmpty()) return 0.0
+-
+-        val exactMatches = trainingFeatures.mapIndexedNotNull { index, trainFeatures ->
+-            if (features.contentEquals(trainFeatures)) {
+-                index to 1.0
+-            } else null
+-        }
+-
+-        if (exactMatches.isNotEmpty()) {
+-            return exactMatches.map { (index, _) -> trainingTargets[index] }.average()
+-        }
+-
+-        val similarities = trainingFeatures.mapIndexed { index, trainFeatures ->
+-            val similarity = cosineSimilarity(features, trainFeatures)
+-            index to similarity
+-        }.filter { it.second > 0.0 }.sortedByDescending { it.second }
+-
+-        if (similarities.isEmpty()) return 0.0
+-
+-        val k = minOf(5, similarities.size)
+-        val topK = similarities.take(k)
+-
+-        val weightedSum = topK.sumOf { (index, similarity) ->
+-            trainingTargets[index] * similarity
+-        }
+-        val weightSum = topK.sumOf { (_, similarity) -> similarity }
+-
+-        return if (weightSum > 0) weightedSum / weightSum else 0.0
+-    }
+-
+-    private fun cosineSimilarity(a: DoubleArray, b: DoubleArray): Double {
+-        if (a.size != b.size) return 0.0
+-
+-        val dotProduct = a.zip(b).sumOf { (x, y) -> x * y }
+-        val normA = sqrt(a.sumOf { it * it })
+-        val normB = sqrt(b.sumOf { it * it })
+-
+-        return if (normA > 0 && normB > 0) dotProduct / (normA * normB) else 0.0
+-    }
++   private lateinit var trainingFeatures: Array<DoubleArray>
++   private lateinit var trainingTargets: DoubleArray
++   var isTrained = false
++
++   fun train(features: Array<DoubleArray>, targets: DoubleArray) {
++      trainingFeatures = features
++      trainingTargets = targets
++      isTrained = true
++   }
++
++   fun predict(features: DoubleArray): Double {
++      if (!isTrained) throw IllegalStateException("Model not trained")
++      if (trainingFeatures.isEmpty()) return 0.0
++
++      val exactMatches = trainingFeatures.mapIndexedNotNull { index, trainFeatures ->
++         if (features.contentEquals(trainFeatures)) {
++            index to 1.0
++         } else null
++      }
++
++      if (exactMatches.isNotEmpty()) {
++         return exactMatches.map { (index, _) -> trainingTargets[index] }.average()
++      }
++
++      val similarities = trainingFeatures.mapIndexed { index, trainFeatures ->
++         val similarity = cosineSimilarity(features, trainFeatures)
++         index to similarity
++      }.filter { it.second > 0.0 }.sortedByDescending { it.second }
++
++      if (similarities.isEmpty()) return 0.0
++
++      val k = minOf(5, similarities.size)
++      val topK = similarities.take(k)
++
++      val weightedSum = topK.sumOf { (index, similarity) ->
++         trainingTargets[index] * similarity
++      }
++      val weightSum = topK.sumOf { (_, similarity) -> similarity }
++
++      return if (weightSum > 0) weightedSum / weightSum else 0.0
++   }
++
++   private fun cosineSimilarity(a: DoubleArray, b: DoubleArray): Double {
++      if (a.size != b.size) return 0.0
++
++      val dotProduct = a.zip(b).sumOf { (x, y) -> x * y }
++      val normA = sqrt(a.sumOf { it * it })
++      val normB = sqrt(b.sumOf { it * it })
++
++      return if (normA > 0 && normB > 0) dotProduct / (normA * normB) else 0.0
++   }
+ }
+\ No newline at end of file
+diff --git a/src/main/kotlin/com/sbarrasa/textregressor/TextFeatureExtractor.kt b/src/main/kotlin/com/sbarrasa/textregressor/TextFeatureExtractor.kt
+index 80652fe..e27f2be 100644
+--- a/src/main/kotlin/com/sbarrasa/textregressor/TextFeatureExtractor.kt
++++ b/src/main/kotlin/com/sbarrasa/textregressor/TextFeatureExtractor.kt
+@@ -3,59 +3,59 @@ package com.sbarrasa.textregressor
+ import smile.nlp.tokenizer.SimpleTokenizer
+ class TextFeatureExtractor {
+-    private val tokenizer = SimpleTokenizer(true)
+-    private var vocabulary: List<String> = emptyList()
++   private val tokenizer = SimpleTokenizer(true)
++   private var vocabulary: List<String> = emptyList()
+-    fun buildVocabulary(texts: Collection<String>) {
+-        val tokenFrequency = mutableMapOf<String, Int>()
+-        texts.forEach { text ->
+-            val tokens = tokenizer.split(text)
+-            tokens.forEach { token ->
+-                if (token.isNotBlank()) {
+-                    tokenFrequency[token] = tokenFrequency.getOrDefault(token, 0) + 1
+-                }
++   fun buildVocabulary(texts: Collection<String>) {
++      val tokenFrequency = mutableMapOf<String, Int>()
++      texts.forEach { text ->
++         val tokens = tokenizer.split(text)
++         tokens.forEach { token ->
++            if (token.isNotBlank()) {
++               tokenFrequency[token] = tokenFrequency.getOrDefault(token, 0) + 1
+             }
+-            for (i in 0 until tokens.size - 1) {
+-                val bigram = "${tokens[i]} ${tokens[i + 1]}"
+-                if (tokens[i].isNotBlank() && tokens[i + 1].isNotBlank()) {
+-                    tokenFrequency[bigram] = tokenFrequency.getOrDefault(bigram, 0) + 1
+-                }
+-            }
+-        }
+-
+-        vocabulary = tokenFrequency.entries
+-            .sortedByDescending { it.value }
+-            .take(100)
+-            .map { it.key }
+-            .sorted()
+-    }
+-
+-    fun extractFeatures(text: String): DoubleArray {
+-        if (vocabulary.isEmpty()) throw IllegalStateException("Vocabulary not built")
+-        val tokens = tokenizer.split(text)
+-        val features = DoubleArray(vocabulary.size)
+-
+-        tokens.forEach { token ->
+-            val index = vocabulary.indexOf(token)
+-            if (index >= 0) {
+-                features[index] += 1.0
+-            }
+-        }
+-
+-        for (i in 0 until tokens.size - 1) {
++         }
++         for (i in 0 until tokens.size - 1) {
+             val bigram = "${tokens[i]} ${tokens[i + 1]}"
+-            val index = vocabulary.indexOf(bigram)
+-            if (index >= 0) {
+-                features[index] += 1.0
++            if (tokens[i].isNotBlank() && tokens[i + 1].isNotBlank()) {
++               tokenFrequency[bigram] = tokenFrequency.getOrDefault(bigram, 0) + 1
+             }
+-        }
+-
+-        return features
+-    }
+-
+-    fun extractFeaturesMatrix(texts: Collection<String>): Array<DoubleArray> {
+-        return texts.map { extractFeatures(it) }.toTypedArray()
+-    }
+-
+-    fun getVocabulary(): List<String> = vocabulary
++         }
++      }
++
++      vocabulary = tokenFrequency.entries
++         .sortedByDescending { it.value }
++         .take(100)
++         .map { it.key }
++         .sorted()
++   }
++
++   fun extractFeatures(text: String): DoubleArray {
++      if (vocabulary.isEmpty()) throw IllegalStateException("Vocabulary not built")
++      val tokens = tokenizer.split(text)
++      val features = DoubleArray(vocabulary.size)
++
++      tokens.forEach { token ->
++         val index = vocabulary.indexOf(token)
++         if (index >= 0) {
++            features[index] += 1.0
++         }
++      }
++
++      for (i in 0 until tokens.size - 1) {
++         val bigram = "${tokens[i]} ${tokens[i + 1]}"
++         val index = vocabulary.indexOf(bigram)
++         if (index >= 0) {
++            features[index] += 1.0
++         }
++      }
++
++      return features
++   }
++
++   fun extractFeaturesMatrix(texts: Collection<String>): Array<DoubleArray> {
++      return texts.map { extractFeatures(it) }.toTypedArray()
++   }
++
++   fun getVocabulary(): List<String> = vocabulary
+ }
+\ No newline at end of file
+diff --git a/src/main/kotlin/com/sbarrasa/textregressor/TextRegressor.kt b/src/main/kotlin/com/sbarrasa/textregressor/TextRegressor.kt
+index 3406902..695f30c 100644
+--- a/src/main/kotlin/com/sbarrasa/textregressor/TextRegressor.kt
++++ b/src/main/kotlin/com/sbarrasa/textregressor/TextRegressor.kt
+@@ -3,31 +3,33 @@ package com.sbarrasa.textregressor
+ typealias TrainingSet = Map<String, Number>
+ class TextRegressor {
+-    private val featureExtractor = TextFeatureExtractor()
+-    private val regressionModel = RegressionModelAdapter()
+-    private var isTrained = false
++   private val featureExtractor = TextFeatureExtractor()
++   private val regressionModel = RegressionModelAdapter()
++   private var _isTrained = false
++   val isTrained: Boolean get() = _isTrained
+-    constructor()
+-    constructor(trainingSet: TrainingSet) {
+-        train(trainingSet)
+-    }
++   constructor()
++
++   constructor(trainingSet: TrainingSet) {
++      train(trainingSet)
++   }
+-    fun train(examples: TrainingSet) {
+-        val texts = examples.keys
+-        val targets = examples.values.map { it.toDouble() }.toDoubleArray()
+-
+-        featureExtractor.buildVocabulary(texts)
+-        val features = featureExtractor.extractFeaturesMatrix(texts)
+-
+-        regressionModel.train(features, targets)
+-        isTrained = true
+-    }
+-
+-    fun analyze(text: String): Double {
+-        if (!isTrained) {
+-            throw IllegalStateException("Model must be trained before analysis. Call train() method or use constructor with training data.")
+-        }
+-        val features = featureExtractor.extractFeatures(text)
+-        return regressionModel.predict(features)
+-    }
++   fun train(examples: TrainingSet) {
++      val texts = examples.keys
++      val targets = examples.values.map { it.toDouble() }.toDoubleArray()
++
++      featureExtractor.buildVocabulary(texts)
++      val features = featureExtractor.extractFeaturesMatrix(texts)
++
++      regressionModel.train(features, targets)
++      _isTrained = true
++   }
++
++   fun analyze(text: String): Double {
++      if (!isTrained) {
++         throw IllegalStateException("Model must be trained before analysis. Call train() method or use constructor with training data.")
++      }
++      val features = featureExtractor.extractFeatures(text)
++      return regressionModel.predict(features)
++   }
+ }
+\ No newline at end of file
+diff --git a/src/test/kotlin/com/sbarrasa/textregressor/UseCaseTest.kt b/src/test/kotlin/com/sbarrasa/textregressor/UseCaseTest.kt
+index 5ce4ef3..148e885 100644
+--- a/src/test/kotlin/com/sbarrasa/textregressor/UseCaseTest.kt
++++ b/src/test/kotlin/com/sbarrasa/textregressor/UseCaseTest.kt
+@@ -1,2 +1,29 @@
+-package textregressor.com.sbarrasa.textregressor
++package textregressor.com.sbarrasa.textregressor
++import com.sbarrasa.textregressor.TextRegressor
++import com.sbarrasa.textregressor.TrainingSet
++import mu.KotlinLogging
++import kotlin.test.assertTrue
++
++abstract class UseCaseTest {
++
++   private val logger = KotlinLogging.logger {}
++
++   abstract val trainingSet: TrainingSet
++
++   val model: TextRegressor by lazy { TextRegressor(trainingSet) }
++
++   fun <T> assertInRange(
++      text: String,
++      expectedRange: ClosedRange<T>
++   ) where T : Number, T : Comparable<T> {
++      val result = model.analyze(text)
++      logger.info("Texto: \"$text\"")
++      logger.info("esperado: ${expectedRange.start}..${expectedRange.endInclusive} Resultado: $result")
++
++      assertTrue(
++         result >= expectedRange.start.toDouble() && result <= expectedRange.endInclusive.toDouble(),
++         "Fuera del rango esperado"
++      )
++   }
++}
+\ No newline at end of file
+diff --git a/src/test/kotlin/usecases/ClarityDetectionTest.kt b/src/test/kotlin/usecases/ClarityDetectionTest.kt
+index 3dcfca5..02f1b33 100644
+--- a/src/test/kotlin/usecases/ClarityDetectionTest.kt
++++ b/src/test/kotlin/usecases/ClarityDetectionTest.kt
+@@ -1,7 +1,7 @@
+ package textregressor.usecases
+ import com.sbarrasa.textregressor.TrainingSet
+-import com.sbarrasa.textregressor.UseCaseTest
++import textregressor.com.sbarrasa.textregressor.UseCaseTest
+ import kotlin.test.Test
+diff --git a/src/test/kotlin/usecases/NewsObjectivityTest.kt b/src/test/kotlin/usecases/NewsObjectivityTest.kt
+index 1a36ff1..17e9e8c 100644
+--- a/src/test/kotlin/usecases/NewsObjectivityTest.kt
++++ b/src/test/kotlin/usecases/NewsObjectivityTest.kt
+@@ -1,6 +1,6 @@
+ package textregressor.usecases
+-import com.sbarrasa.textregressor.UseCaseTest
++import textregressor.com.sbarrasa.textregressor.UseCaseTest
+ import kotlin.test.Test
+diff --git a/src/test/kotlin/usecases/PriorityDetectionTest.kt b/src/test/kotlin/usecases/PriorityDetectionTest.kt
+index faf7cd6..028e4d7 100644
+--- a/src/test/kotlin/usecases/PriorityDetectionTest.kt
++++ b/src/test/kotlin/usecases/PriorityDetectionTest.kt
+@@ -1,7 +1,7 @@
+ package textregressor.usecases
+ import com.sbarrasa.textregressor.TrainingSet
+-import com.sbarrasa.textregressor.UseCaseTest
++import textregressor.com.sbarrasa.textregressor.UseCaseTest
+ import kotlin.test.Test
+ class PriorityDetectionTest : UseCaseTest() {
+diff --git a/src/test/kotlin/usecases/ProductsatisfactionTest.kt b/src/test/kotlin/usecases/ProductsatisfactionTest.kt
+index 9c78974..041c55e 100644
+--- a/src/test/kotlin/usecases/ProductsatisfactionTest.kt
++++ b/src/test/kotlin/usecases/ProductsatisfactionTest.kt
+@@ -1,7 +1,7 @@
+ package textregressor.usecases
+ import com.sbarrasa.textregressor.TrainingSet
+-import com.sbarrasa.textregressor.UseCaseTest
++import textregressor.com.sbarrasa.textregressor.UseCaseTest
+ import kotlin.test.Test
+ class ProductSatisfactionTest : UseCaseTest() {
+diff --git a/test_new_api.kt b/test_new_api.kt
+index 55667bc..65e3d71 100644
+--- a/test_new_api.kt
++++ b/test_new_api.kt
+@@ -2,46 +2,46 @@ import com.sbarrasa.textregressor.TextRegressor
+ import com.sbarrasa.textregressor.TrainingSet
+ fun main() {
+-    val trainingSet: TrainingSet = mapOf(
+-        "positive text" to 1.0,
+-        "negative text" to 0.0,
+-        "neutral text" to 0.5
+-    )
+-
+-    println("Testing TextRegressor new API...")
+-
+-    // Test 1: Constructor with training data (immediate training)
+-    println("\n1. Testing constructor with training data:")
+-    try {
+-        val model1 = TextRegressor(trainingSet)
+-        val result1 = model1.analyze("positive text")
+-        println("✓ Constructor with training data works. Result: $result1")
+-    } catch (e: Exception) {
+-        println("✗ Constructor with training data failed: ${e.message}")
+-    }
+-
+-    // Test 2: Constructor without data + train later (deferred training)
+-    println("\n2. Testing constructor without data + train later:")
+-    try {
+-        val model2 = TextRegressor()
+-        model2.train(trainingSet)
+-        val result2 = model2.analyze("positive text")
+-        println("✓ Deferred training works. Result: $result2")
+-    } catch (e: Exception) {
+-        println("✗ Deferred training failed: ${e.message}")
+-    }
+-
+-    // Test 3: Error handling - analyze before training
+-    println("\n3. Testing error handling (analyze before training):")
+-    try {
+-        val model3 = TextRegressor()
+-        model3.analyze("test text")
+-        println("✗ Should have thrown an exception!")
+-    } catch (e: IllegalStateException) {
+-        println("✓ Correctly throws exception when not trained: ${e.message}")
+-    } catch (e: Exception) {
+-        println("✗ Unexpected exception: ${e.message}")
+-    }
+-
+-    println("\nAll tests completed!")
++   val trainingSet: TrainingSet = mapOf(
++      "positive text" to 1.0,
++      "negative text" to 0.0,
++      "neutral text" to 0.5
++   )
++
++   println("Testing TextRegressor new API...")
++
++   // Test 1: Constructor with training data (immediate training)
++   println("\n1. Testing constructor with training data:")
++   try {
++      val model1 = TextRegressor(trainingSet)
++      val result1 = model1.analyze("positive text")
++      println("✓ Constructor with training data works. Result: $result1")
++   } catch (e: Exception) {
++      println("✗ Constructor with training data failed: ${e.message}")
++   }
++
++   // Test 2: Constructor without data + train later (deferred training)
++   println("\n2. Testing constructor without data + train later:")
++   try {
++      val model2 = TextRegressor()
++      model2.train(trainingSet)
++      val result2 = model2.analyze("positive text")
++      println("✓ Deferred training works. Result: $result2")
++   } catch (e: Exception) {
++      println("✗ Deferred training failed: ${e.message}")
++   }
++
++   // Test 3: Error handling - analyze before training
++   println("\n3. Testing error handling (analyze before training):")
++   try {
++      val model3 = TextRegressor()
++      model3.analyze("test text")
++      println("✗ Should have thrown an exception!")
++   } catch (e: IllegalStateException) {
++      println("✓ Correctly throws exception when not trained: ${e.message}")
++   } catch (e: Exception) {
++      println("✗ Unexpected exception: ${e.message}")
++   }
++
++   println("\nAll tests completed!")
+ }
+\ No newline at end of file
