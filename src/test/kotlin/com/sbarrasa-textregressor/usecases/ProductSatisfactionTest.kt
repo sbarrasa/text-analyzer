@@ -45,6 +45,6 @@ class ProductSatisfactionTest : UseCaseTest() {
    @Test
    fun negativeEvaluationShort() {
       val text = "Una porquería, pésimo y defectuoso desde el primer día."
-      assertInRange(text, -5.0..0.0)
+      assertInRange(text, -5.0..-2.0)
    }
 }

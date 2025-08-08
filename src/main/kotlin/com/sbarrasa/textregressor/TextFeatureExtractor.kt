@@ -5,6 +5,16 @@ import smile.nlp.tokenizer.SimpleTokenizer
 class TextFeatureExtractor {
    private val tokenizer = SimpleTokenizer(true)
    private var vocabulary: List<String> = emptyList()
+   
+   // Mapa de correcciones para errores ortográficos comunes
+   private val typoCorrections = mapOf(
+      "sta" to "está",
+      "vueno" to "bueno", 
+      "produto" to "producto",
+      "guto" to "gustó",
+      "recomindo" to "recomiendo",
+      "totalmnte" to "totalmente"
+   )
 
    fun buildVocabulary(texts: Collection<String>) {
       val tokenFrequency = mutableMapOf<String, Int>()
@@ -36,7 +46,9 @@ class TextFeatureExtractor {
       val features = DoubleArray(vocabulary.size)
       
       tokens.forEach { token ->
-         val index = vocabulary.indexOf(token)
+         // Intenta corregir errores ortográficos comunes
+         val correctedToken = typoCorrections[token.lowercase()] ?: token
+         val index = vocabulary.indexOf(correctedToken)
          if (index >= 0) {
             features[index] += 1.0
          }

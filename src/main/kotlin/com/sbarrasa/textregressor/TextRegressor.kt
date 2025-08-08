@@ -1,7 +1,5 @@
 package com.sbarrasa.textregressor
 
-typealias TrainingSet = Map<String, Number>
-
 class TextRegressor {
    private val featureExtractor = TextFeatureExtractor()
    private val regressionModel = RegressionModelAdapter()
