@@ -27,7 +27,8 @@ class ProductSatisfactionTest : UseCaseTest() {
       "muy bueno" to 4,
       "funciona bien" to 4,
       "recomendable" to 4,
-      "vale la pena" to 4
+      "vale la pena" to 4,
+      "recomiendo totalmente" to 5
    )
 
    @Test
@@ -46,5 +47,11 @@ class ProductSatisfactionTest : UseCaseTest() {
    fun negativeEvaluationShort() {
       val text = "Una porquería, pésimo y defectuoso desde el primer día."
       assertInRange(text, -5.0..-2.0)
+   }
+
+   @Test
+   fun productWithBadTypos() {
+      val text = "El produto sta muy vueno, me guto mucho y lo recomindo totalmnte."
+      assertInRange(text, 3.0..5.0)
    }
 }
