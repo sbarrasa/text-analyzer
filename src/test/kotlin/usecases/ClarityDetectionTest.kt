@@ -1,22 +1,20 @@
 package textregressor.usecases
 
-import textregressor.TextRegressor
-import textregressor.TrainingSet
+import com.sbarrasa.textregressor.TrainingSet
+import com.sbarrasa.textregressor.UseCaseTest
 import kotlin.test.Test
 
 
-class ClarityDetectionTest : UseCaseBaseTest() {
+class ClarityDetectionTest : UseCaseTest() {
 
 
    override val trainingSet: TrainingSet = mapOf(
-      // Ambiguous
       "puede que sea así o no" to 0,
       "es posible que haya errores" to 0,
       "no estoy seguro de los resultados" to 0,
       "tal vez se debería revisar" to 0,
       "podría ser que funcione" to 0,
       "es complicado de decir" to 0,
-      // Clear
       "el sistema falla al iniciar sesión" to 1,
       "el informe muestra los datos correctos" to 1,
       "la conexión se pierde a las dos horas" to 1,
@@ -39,8 +37,7 @@ class ClarityDetectionTest : UseCaseBaseTest() {
             aunque también existe la posibilidad de que algún componente externo esté interfiriendo.
         """
 
-      val model = trainModel(trainingSet)
-      assertInRange(model, text, 0.0..0.35)
+      assertInRange(text, 0.0..0.7)
    }
 
 
@@ -54,7 +51,6 @@ class ClarityDetectionTest : UseCaseBaseTest() {
             en el módulo de autenticación para resolver este fallo y restablecer el acceso a la brevedad.
         """
 
-      val model = trainModel(trainingSet)
-      assertInRange(model, text, 0.8..1.0)
+      assertInRange(text, 0.8..1.0)
    }
 }

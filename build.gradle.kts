@@ -10,19 +10,15 @@ repositories {
 }
 
 dependencies {
-   implementation("org.apache.commons:commons-math3:3.6.1")
-   implementation("org.apache.lucene:lucene-core:9.9.1")
-   implementation("org.apache.lucene:lucene-analysis-common:9.9.1")
-   implementation("org.apache.lucene:lucene-queryparser:9.9.1")
-   implementation("org.apache.lucene:lucene-analyzers-common:8.11.2")
-   
-   // Smile (Statistical Machine Intelligence and Learning Engine)
-   implementation("com.github.haifengl:smile-core:3.0.2")
+   // Smile NLP for text tokenization
    implementation("com.github.haifengl:smile-nlp:3.0.2")
    
+   // Logging - Kotlin logging (wraps SLF4J with Kotlin-friendly API)
+   implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+   implementation("ch.qos.logback:logback-classic:1.4.14")
+   
    testImplementation(kotlin("test"))
-   testImplementation("io.kotest:kotest-runner-junit5:5.9.0")
-   testImplementation("io.kotest:kotest-assertions-core:5.9.0")
+   implementation(kotlin("test"))
 }
 
    tasks.test {

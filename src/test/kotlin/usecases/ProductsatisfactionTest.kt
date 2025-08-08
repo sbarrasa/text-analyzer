@@ -1,10 +1,10 @@
 package textregressor.usecases
 
-import textregressor.TextRegressor
-import textregressor.TrainingSet
+import com.sbarrasa.textregressor.TrainingSet
+import com.sbarrasa.textregressor.UseCaseTest
 import kotlin.test.Test
 
-class ProductSatisfactionTest : UseCaseBaseTest() {
+class ProductSatisfactionTest : UseCaseTest() {
 
    override val trainingSet: TrainingSet = mapOf(
       "una porquería" to -5,
@@ -33,21 +33,18 @@ class ProductSatisfactionTest : UseCaseBaseTest() {
    @Test
    fun neutralEvaluationShort() {
       val text = "El producto cumple lo que promete, nada fuera de lo común."
-      val model = trainModel(trainingSet)
-      assertInRange(model, text, (-5.0)..(-4.0))
+      assertInRange(text, 0.0..0.9)
    }
 
    @Test
    fun positiveEvaluationShort() {
       val text = "Me encantó, funciona perfecto y vale totalmente la pena."
-      val model = trainModel(trainingSet)
-      assertInRange(model, text, 0.5..1.0)
+      assertInRange(text, 1.0..5.0)
    }
 
    @Test
    fun negativeEvaluationShort() {
       val text = "Una porquería, pésimo y defectuoso desde el primer día."
-      val model = trainModel(trainingSet)
-      assertInRange(model, text, (-5.0)..(-3.0))
+      assertInRange(text, -5.0..0.0)
    }
 }

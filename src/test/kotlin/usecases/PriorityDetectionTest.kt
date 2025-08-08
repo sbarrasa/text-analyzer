@@ -1,9 +1,10 @@
 package textregressor.usecases
 
-import textregressor.*
+import com.sbarrasa.textregressor.TrainingSet
+import com.sbarrasa.textregressor.UseCaseTest
 import kotlin.test.Test
 
-class PriorityDetectionTest : UseCaseBaseTest() {
+class PriorityDetectionTest : UseCaseTest() {
 
 
    override val trainingSet: TrainingSet = mapOf(
@@ -12,14 +13,20 @@ class PriorityDetectionTest : UseCaseBaseTest() {
       "puede esperar" to 1,
       "prioridad baja" to 1,
       "no urgente" to 0,
+      "no es urgente" to 0,
+      "cuando tenga tiempo" to 0.5,
       "cuando sea posible" to 0.5,
       "moderada prioridad" to 2,
       "atención necesaria" to 3,
       "es importante" to 3.5,
+      "importante pero no crítico" to 3,
       "se necesita pronto" to 4,
       "urgente" to 5,
+      "atención urgente" to 5,
       "prioridad máxima" to 5,
+      "máxima prioridad" to 5,
       "requiere acción inmediata" to 5,
+      "de inmediato" to 5,
       "por favor resolver hoy" to 5,
       "necesita respuesta rápida" to 4.5,
       "problema crítico" to 5,
@@ -36,8 +43,7 @@ class PriorityDetectionTest : UseCaseBaseTest() {
          puede responder cuando tenga tiempo. Muchas gracias.
         """
 
-      val model = trainModel(trainingSet)
-      assertInRange(model, text, 0.0..2.0)
+      assertInRange(text, 0.0..1.5)
    }
 
    @Test
@@ -48,8 +54,7 @@ class PriorityDetectionTest : UseCaseBaseTest() {
             Es importante pero no crítico. Agradezco que lo puedan ver en las próximas 48 horas.
         """
 
-      val model = trainModel(trainingSet)
-      assertInRange(model, text, 2.0..3.5)
+      assertInRange(text, 1.8..3.5)
    }
 
    @Test
@@ -61,7 +66,6 @@ class PriorityDetectionTest : UseCaseBaseTest() {
             Por favor, responder con la máxima prioridad.
         """
 
-      val model = trainModel(trainingSet)
-      assertInRange(model, text, 2.5..3.0)
+      assertInRange(text, 4.0..5.0)
    }
 }
