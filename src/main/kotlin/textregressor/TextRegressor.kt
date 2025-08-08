@@ -1,28 +1,23 @@
 package textregressor
 
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
-import org.nd4j.linalg.factory.Nd4j
+typealias TrainingSet = Map<String, Number>
 
-typealias Examples = Map<String, Number>
+class TextRegressor {
+    private val featureExtractor = TextFeatureExtractor()
+    private val regressionModel = RegressionModelAdapter()
 
-class TextRegressor(
-   private val epochs: Int = 100,
-   private val learningRate: Double = 0.01,
-   private val hiddenSize: Int = 10
-) {
-   private lateinit var vocab: List<String>
-   private lateinit var model: MultiLayerNetwork
-
-   fun train(examples: Examples) {
-      vocab = VocabularyBuilder.build(examples)
-      val dataset = DataPreparer.prepareDataset(examples, vocab)
-      model = ModelTrainer.trainModel(dataset, vocab.size, epochs, learningRate, hiddenSize)
-   }
-
-   fun analyze(text: String): Double {
-      val vector = DataPreparer.vectorize(text, vocab)
-      val input = Nd4j.create(vector).reshape(intArrayOf(1, vocab.size))
-      return model.output(input).getDouble(0)
-   }
+    fun train(examples: TrainingSet) {
+        val texts = examples.keys.toList()
+        val targets = examples.values.map { it.toDouble() }.toDoubleArray()
+        
+        featureExtractor.buildVocabulary(texts)
+        val features = featureExtractor.extractFeaturesMatrix(texts)
+        
+        regressionModel.train(features, targets)
+    }
+    
+    fun analyze(text: String): Double {
+        val features = featureExtractor.extractFeatures(text)
+        return regressionModel.predict(features)
+    }
 }
-
