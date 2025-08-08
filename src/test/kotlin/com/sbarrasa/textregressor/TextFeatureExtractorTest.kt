@@ -1,10 +1,7 @@
 package com.sbarrasa.textregressor
 
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
 import mu.KotlinLogging
 
 class TextFeatureExtractorTest {
