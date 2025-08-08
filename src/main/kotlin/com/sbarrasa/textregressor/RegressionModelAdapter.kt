@@ -5,12 +5,13 @@ import kotlin.math.sqrt
 class RegressionModelAdapter {
    private lateinit var trainingFeatures: Array<DoubleArray>
    private lateinit var trainingTargets: DoubleArray
-   var isTrained = false
+   
+   val isTrained: Boolean
+      get() = ::trainingFeatures.isInitialized && ::trainingTargets.isInitialized
    
    fun train(features: Array<DoubleArray>, targets: DoubleArray) {
       trainingFeatures = features
       trainingTargets = targets
-      isTrained = true
    }
    
    fun predict(features: DoubleArray): Double {

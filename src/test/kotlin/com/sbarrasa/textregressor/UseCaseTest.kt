@@ -1,4 +1,4 @@
-package textregressor.com.sbarrasa.textregressor
+package com.sbarrasa.textregressor
 
 import com.sbarrasa.textregressor.TextRegressor
 import com.sbarrasa.textregressor.TrainingSet

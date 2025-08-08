@@ -3,7 +3,9 @@ package com.sbarrasa.textregressor
 class TextRegressor {
    private val featureExtractor = TextFeatureExtractor()
    private val regressionModel = RegressionModelAdapter()
-   var isTrained: Boolean = false
+   
+   val isTrained: Boolean
+      get() = regressionModel.isTrained && featureExtractor.getVocabulary().isNotEmpty()
 
    constructor()
    
@@ -19,13 +21,10 @@ class TextRegressor {
       val features = featureExtractor.extractFeaturesMatrix(texts)
       
       regressionModel.train(features, targets)
-      isTrained = true
    }
    
    fun analyze(text: String): Double {
-      if (!isTrained) {
-         throw IllegalStateException("Model must be trained before analysis. Call train() method or use constructor with training data.")
-      }
+      if (!isTrained) throw IllegalStateException("Model must be trained before analysis.")
       val features = featureExtractor.extractFeatures(text)
       return regressionModel.predict(features)
    }
