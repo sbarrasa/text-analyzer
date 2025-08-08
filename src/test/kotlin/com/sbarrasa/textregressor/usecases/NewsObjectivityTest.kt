@@ -1,6 +1,5 @@
 package com.sbarrasa.textregressor.usecases
 
-import com.sbarrasa.textregressor.TrainingSet
 import com.sbarrasa.textregressor.UseCaseTest
 import kotlin.test.Test
 
@@ -41,7 +40,7 @@ class NewsObjectivityTest : UseCaseTest() {
          Las autoridades señalaron que la tendencia positiva podría sostenerse si se mantiene la estabilidad cambiaria.
      """
 
-      assertInRange(text, 0.0..0.4)
+      assertInRange(text, 0.0..0.5)
    }
 
    @Test

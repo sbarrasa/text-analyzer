@@ -1,7 +1,5 @@
 package com.sbarrasa.textregressor
 
-import com.sbarrasa.textregressor.TextRegressor
-import com.sbarrasa.textregressor.TrainingSet
 import mu.KotlinLogging
 import kotlin.test.assertTrue
 
@@ -13,16 +11,16 @@ abstract class UseCaseTest {
 
    val model: TextRegressor by lazy { TextRegressor(trainingSet) }
 
-   fun <T> assertInRange(
+   fun assertInRange(
       text: String,
-      expectedRange: ClosedRange<T>
-   ) where T : Number, T : Comparable<T> {
+      expectedRange: ClosedRange<Double>
+   ) {
       val result = model.analyze(text)
       logger.info("Texto: \"$text\"")
-      logger.info("esperado: ${expectedRange.start}..${expectedRange.endInclusive} Resultado: $result")
+      logger.info("Esperado: $expectedRange | Resultado: $result")
 
       assertTrue(
-         result >= expectedRange.start.toDouble() && result <= expectedRange.endInclusive.toDouble(),
+         result in expectedRange,
          "Fuera del rango esperado"
       )
    }

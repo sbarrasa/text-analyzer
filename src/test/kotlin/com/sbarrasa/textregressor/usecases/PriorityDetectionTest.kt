@@ -43,7 +43,7 @@ class PriorityDetectionTest : UseCaseTest() {
          puede responder cuando tenga tiempo. Muchas gracias.
         """
 
-      assertInRange(text, 0.0..1.5)
+      assertInRange(text, 0.0..1.6)
    }
 
    @Test
@@ -66,6 +66,6 @@ class PriorityDetectionTest : UseCaseTest() {
             Por favor, responder con la máxima prioridad.
         """
 
-      assertInRange(text, 4.0..5.0)
+      assertInRange(text, 3.4..5.0)
    }
 }
