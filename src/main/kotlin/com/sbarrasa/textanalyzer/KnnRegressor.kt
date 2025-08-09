@@ -4,124 +4,123 @@ import kotlin.math.sqrt
 
 /**
  * Regresor basado en algoritmo K-Nearest Neighbors (KNN)
- * 
- * Esta clase implementa un modelo de regresión basado en vecinos más cercanos que
- * utiliza similaridad coseno para encontrar ejemplos similares en el conjunto de
- * entrenamiento y realizar predicciones. Es especialmente útil para problemas donde
- * la relación entre características y valores objetivo no es lineal.
- * 
- * El algoritmo funciona de la siguiente manera:
- * 1. Almacena todos los ejemplos de entrenamiento (características y valores objetivo)
- * 2. Para cada predicción, encuentra los K ejemplos más similares usando similaridad coseno
- * 3. Calcula una predicción ponderada basada en la similaridad de los vecinos
+ *
+ * Implementa un KNN regresor con similaridad coseno.
  */
-class KnnRegressor {
-   // Matriz de características de entrenamiento donde cada fila representa un ejemplo
-   // y cada columna una característica extraída del texto
-   private lateinit var trainFeats: Array<DoubleArray>
-   
+class KnnRegressor(private val k: Int = 5) {
+
+   // Matriz de características de entrenamiento: una fila por ejemplo
+   private lateinit var trainingFeatures: Array<DoubleArray>
+
    // Vector de valores objetivo correspondientes a cada ejemplo de entrenamiento
-   private lateinit var trainTargs: DoubleArray
-   
-   /**
-    * Propiedad que indica si el modelo ha sido entrenado
-    * 
-    * Verifica que tanto las características como los valores objetivo hayan sido
-    * inicializados correctamente. Es esencial verificar esto antes de realizar
-    * predicciones para evitar errores.
-    * 
-    * @return true si el modelo está entrenado, false en caso contrario
-    */
+   private lateinit var trainingTargets: DoubleArray
+
+   private companion object {
+      const val DEFAULT_PREDICTION = 0.0
+   }
+
    val isTrained: Boolean
-      get() = ::trainFeats.isInitialized && ::trainTargs.isInitialized
-   
+      get() = ::trainingFeatures.isInitialized && ::trainingTargets.isInitialized
+
    /**
-    * Entrena el modelo almacenando los ejemplos de entrenamiento
-    * 
-    * Este método no realiza cálculos complejos sino que simplemente almacena
-    * todos los ejemplos de entrenamiento para su uso posterior durante la predicción.
-    * Es un enfoque de "aprendizaje perezoso" donde el procesamiento real ocurre
-    * en el momento de la predicción.
-    * 
-    * @param features Matriz de características donde cada fila es un ejemplo
-    * @param targets Vector de valores objetivo correspondientes a cada ejemplo
+    * Entrena el modelo almacenando los ejemplos de entrenamiento.
+    * Valida tamaños y coherencia dimensional.
     */
    fun train(features: Array<DoubleArray>, targets: DoubleArray) {
-      // Almacenar las características de entrenamiento
-      trainFeats = features
-      
-      // Almacenar los valores objetivo de entrenamiento
-      trainTargs = targets
+      require(features.size == targets.size) {
+         "features y targets deben tener la misma cantidad de ejemplos"
+      }
+      if (features.isNotEmpty()) {
+         val expectedSize = features[0].size
+         require(features.all { it.size == expectedSize }) {
+            "Todas las filas de features deben tener la misma longitud"
+         }
+      }
+      trainingFeatures = features
+      trainingTargets = targets
    }
-   
+
    /**
-    * Realiza una predicción usando el algoritmo K-Nearest Neighbors con similaridad coseno
-    * 
-    * Este método implementa la lógica central del algoritmo KNN:
-    * 1. Primero busca coincidencias exactas en los datos de entrenamiento
-    * 2. Si no las encuentra, calcula la similaridad coseno con todos los ejemplos
-    * 3. Selecciona los K ejemplos más similares (K=5 por defecto)
-    * 4. Calcula una predicción ponderada basada en la similaridad
-    * 
-    * La predicción ponderada da más peso a los ejemplos más similares, lo que
-    * resulta en predicciones más precisas y robustas.
-    * 
-    * @param features Vector de características del ejemplo a predecir
-    * @return Valor predicho basado en los vecinos más cercanos
-    * @throws IllegalStateException si el modelo no ha sido entrenado
+    * Realiza una predicción usando KNN con similaridad coseno.
     */
    fun predict(features: DoubleArray): Double {
-      // Verificar que el modelo haya sido entrenado previamente
       if (!isTrained) throw IllegalStateException("Model not trained")
 
-      // PASO 1: Buscar coincidencias exactas en el conjunto de entrenamiento
-      // Si encontramos ejemplos idénticos, podemos devolver su promedio directamente
-      val exactMatches = trainFeats.mapIndexedNotNull { index, trainFeatures ->
-         if (features.contentEquals(trainFeatures)) {
-            index to 1.0  // Similaridad perfecta = 1.0
-         } else null
-      }
-      
-      // Si hay coincidencias exactas, retornar el promedio de sus valores objetivo
-      if (exactMatches.isNotEmpty()) {
-         return exactMatches.map { (index, _) -> trainTargs[index] }.average()
-      }
-      
-      // PASO 2: Calcular similaridad coseno con todos los ejemplos de entrenamiento
-      val similarities = trainFeats.mapIndexed { index, trainFeatures ->
-         val similarity = cosineSimilarity(features, trainFeatures)
-         index to similarity  // Guardar el índice y su similaridad
-      }.filter { it.second > 0.0 }  // Filtrar similaridades positivas
-       .sortedByDescending { it.second }  // Ordenar por similaridad descendente
-      
-      // Si no hay ejemplos similares, devolver predicción por defecto
-      if (similarities.isEmpty()) return 0.0
-      
-      // PASO 3: Seleccionar los K vecinos más cercanos (K = 5)
-      val k = minOf(5, similarities.size)  // Usar máximo 5 vecinos o todos si hay menos
-      val topK = similarities.take(k)
-      
-      // PASO 4: Calcular predicción ponderada
-      // Suma ponderada: cada vecino contribuye proporcionalmente a su similaridad
-      val weightedSum = topK.sumOf { (index, similarity) ->
-         trainTargs[index] * similarity
-      }
-      
-      // Suma total de pesos para normalizar
-      val weightSum = topK.sumOf { (_, similarity) -> similarity }
-      
-      // Retornar predicción normalizada o 0 si no hay pesos válidos
-      return if (weightSum > 0) weightedSum / weightSum else 0.0
-   }
-   
-   private fun cosineSimilarity(a: DoubleArray, b: DoubleArray): Double {
-      if (a.size != b.size) return 0.0
-      
-      val dotProduct = a.zip(b).sumOf { (x, y) -> x * y }
-      val normA = sqrt(a.sumOf { it * it })
-      val normB = sqrt(b.sumOf { it * it })
-      
-      return if (normA > 0 && normB > 0) dotProduct / (normA * normB) else 0.0
+      // 1) Coincidencias exactas
+      val exactMatchIndices = findExactMatches(features)
+      if (exactMatchIndices.isNotEmpty()) return averageTargetOf(exactMatchIndices)
+
+      // 2) Similaridades coseno
+      val similarities = cosineSimilarities(features)
+      if (similarities.isEmpty()) return DEFAULT_PREDICTION
+
+      // 3) Vecinos más cercanos
+      val topK = topKNeighbors(similarities)
+
+      // 4) Predicción ponderada
+      return weightedPrediction(topK)
    }
 
+   /**
+    * Busca índices con coincidencia exacta en el conjunto de entrenamiento.
+    */
+   private fun findExactMatches(features: DoubleArray): List<Int> {
+      return trainingFeatures.mapIndexedNotNull { index, row ->
+         if (features.contentEquals(row)) index else null
+      }
+   }
+
+   /**
+    * Promedio de los targets de los índices provistos.
+    */
+   private fun averageTargetOf(indices: List<Int>): Double {
+      return indices.map { idx -> trainingTargets[idx] }.average()
+   }
+
+   /**
+    * Similaridad coseno con todos los ejemplos, filtrando valores no positivos.
+    */
+   private fun cosineSimilarities(features: DoubleArray): List<Neighbor> {
+      return trainingFeatures.mapIndexed { index, row ->
+         Neighbor(index, cosineSimilarity(features, row))
+      }.asSequence()
+         .filter { it.similarity > 0.0 }
+         .sortedByDescending { it.similarity }
+         .toList()
+   }
+
+   /**
+    * Selecciona los K vecinos más cercanos respetando el tamaño disponible.
+    */
+   private fun topKNeighbors(similarities: List<Neighbor>): List<Neighbor> {
+      val kEff = minOf(k, similarities.size)
+      return similarities.take(kEff)
+   }
+
+   /**
+    * Predicción ponderada por similaridad.
+    */
+   private fun weightedPrediction(neighbors: List<Neighbor>): Double {
+      val weightedSum = neighbors.sumOf { (index, sim) -> trainingTargets[index] * sim }
+      val weightSum = neighbors.sumOf { it.similarity }
+      return if (weightSum > 0.0) weightedSum / weightSum else DEFAULT_PREDICTION
+   }
+
+   private fun cosineSimilarity(a: DoubleArray, b: DoubleArray): Double {
+      if (a.size != b.size) return 0.0
+      var dot = 0.0
+      var normA = 0.0
+      var normB = 0.0
+      for (i in a.indices) {
+         val x = a[i]
+         val y = b[i]
+         dot += x * y
+         normA += x * x
+         normB += y * y
+      }
+      val denom = sqrt(normA) * sqrt(normB)
+      return if (denom > 0.0) dot / denom else 0.0
+   }
+
+   private data class Neighbor(val index: Int, val similarity: Double)
 }

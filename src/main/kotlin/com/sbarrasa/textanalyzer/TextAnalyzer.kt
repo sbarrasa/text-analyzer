@@ -29,3 +29,6 @@ class TextAnalyzer {
       return regressionModel.predict(features)
    }
 }
+
+typealias TrainingSet = Map<String, Number>
+
