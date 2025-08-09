@@ -10,8 +10,6 @@ repositories {
 }
 
 dependencies {
-   // Smile NLP for text tokenization
-   implementation("com.github.haifengl:smile-nlp:3.0.2")
    
    // Logging - Kotlin logging (wraps SLF4J with Kotlin-friendly API)
    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
