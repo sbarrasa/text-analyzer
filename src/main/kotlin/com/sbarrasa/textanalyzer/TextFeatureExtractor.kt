@@ -9,19 +9,14 @@ package com.sbarrasa.textanalyzer
  */
 class TextFeatureExtractor {
 
-   // Tokenizador que divide el texto en palabras individuales
    private val tokenizer = SimpleTokenizer()
 
-   // Extractor de vocabulario para construir diccionarios de palabras y bigramas
    private val vocabularyExtractor = VocabularyExtractor()
 
-   // Lista ordenada de palabras y bigramas que conforman nuestro vocabulario
    private var vocabulary: List<String> = emptyList()
 
-   // Índice para acceder al número de dimensión de cada término en O(1)
    private var termIndex: Map<String, Int> = emptyMap()
 
-   // Corrector ortográfico que se inicializa después de construir el vocabulario
    private var spellCorrector: SpellCorrector? = null
 
    /**
