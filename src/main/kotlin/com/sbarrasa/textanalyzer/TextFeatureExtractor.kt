@@ -68,8 +68,6 @@ class TextFeatureExtractor {
     */
    fun getVocabulary(): List<String> = vocabulary
 
-   // -------------------- Privado / Helpers --------------------
-
    private fun ensureVocabularyBuilt() {
       if (vocabulary.isEmpty()) {
          throw IllegalStateException("Vocabulary not built")

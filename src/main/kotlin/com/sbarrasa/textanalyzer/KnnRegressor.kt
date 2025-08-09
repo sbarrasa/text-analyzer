@@ -7,7 +7,13 @@ import kotlin.math.sqrt
  *
  * Implementa un KNN regresor con similaridad coseno.
  */
-class KnnRegressor(private val k: Int = 5) {
+class KnnRegressor {
+   private var k: Int
+
+   constructor(k: Int = 5) {
+      require(k > 0) { "k debe ser mayor que 0" }
+      this.k = k
+   }
 
    // Matriz de características de entrenamiento: una fila por ejemplo
    private lateinit var trainingFeatures: Array<DoubleArray>
@@ -17,6 +23,7 @@ class KnnRegressor(private val k: Int = 5) {
 
    private companion object {
       const val DEFAULT_PREDICTION = 0.0
+      const val MIN_SIMILARITY_EPS = 1e-12
    }
 
    val isTrained: Boolean
@@ -27,15 +34,7 @@ class KnnRegressor(private val k: Int = 5) {
     * Valida tamaños y coherencia dimensional.
     */
    fun train(features: Array<DoubleArray>, targets: DoubleArray) {
-      require(features.size == targets.size) {
-         "features y targets deben tener la misma cantidad de ejemplos"
-      }
-      if (features.isNotEmpty()) {
-         val expectedSize = features[0].size
-         require(features.all { it.size == expectedSize }) {
-            "Todas las filas de features deben tener la misma longitud"
-         }
-      }
+      validateFeatureMatrix(features, targets)
       trainingFeatures = features
       trainingTargets = targets
    }
@@ -44,7 +43,7 @@ class KnnRegressor(private val k: Int = 5) {
     * Realiza una predicción usando KNN con similaridad coseno.
     */
    fun predict(features: DoubleArray): Double {
-      if (!isTrained) throw IllegalStateException("Model not trained")
+      requireTrainedAndDimensions(features)
 
       // 1) Coincidencias exactas
       val exactMatchIndices = findExactMatches(features)
@@ -61,30 +60,49 @@ class KnnRegressor(private val k: Int = 5) {
       return weightedPrediction(topK)
    }
 
+   private fun validateFeatureMatrix(features: Array<DoubleArray>, targets: DoubleArray) {
+      require(features.size == targets.size) {
+         "features y targets deben tener la misma cantidad de ejemplos"
+      }
+      if (features.isNotEmpty()) {
+         val expectedSize = features[0].size
+         require(features.all { it.size == expectedSize }) {
+            "Todas las filas de features deben tener la misma longitud ($expectedSize)"
+         }
+      }
+   }
+
+   private fun requireTrainedAndDimensions(sample: DoubleArray) {
+      check(isTrained) { "El modelo debe estar entrenado antes de predecir." }
+      val expected = trainingFeatures.firstOrNull()?.size ?: 0
+      require(sample.size == expected) {
+         "Dimensión de features inválida: se esperaba $expected y se recibió ${sample.size}"
+      }
+   }
+
    /**
     * Busca índices con coincidencia exacta en el conjunto de entrenamiento.
     */
    private fun findExactMatches(features: DoubleArray): List<Int> {
-      return trainingFeatures.mapIndexedNotNull { index, row ->
-         if (features.contentEquals(row)) index else null
-      }
+      return trainingFeatures.asSequence()
+         .mapIndexedNotNull { index, row -> if (features.contentEquals(row)) index else null }
+         .toList()
    }
 
    /**
     * Promedio de los targets de los índices provistos.
     */
    private fun averageTargetOf(indices: List<Int>): Double {
-      return indices.map { idx -> trainingTargets[idx] }.average()
+      return indices.asSequence().map { idx -> trainingTargets[idx] }.average()
    }
 
    /**
     * Similaridad coseno con todos los ejemplos, filtrando valores no positivos.
     */
    private fun cosineSimilarities(features: DoubleArray): List<Neighbor> {
-      return trainingFeatures.mapIndexed { index, row ->
-         Neighbor(index, cosineSimilarity(features, row))
-      }.asSequence()
-         .filter { it.similarity > 0.0 }
+      return trainingFeatures.asSequence()
+         .mapIndexed { index, row -> Neighbor(index, cosineSimilarity(features, row)) }
+         .filter { it.similarity > MIN_SIMILARITY_EPS }
          .sortedByDescending { it.similarity }
          .toList()
    }
@@ -101,6 +119,7 @@ class KnnRegressor(private val k: Int = 5) {
     * Predicción ponderada por similaridad.
     */
    private fun weightedPrediction(neighbors: List<Neighbor>): Double {
+      if (neighbors.isEmpty()) return DEFAULT_PREDICTION
       val weightedSum = neighbors.sumOf { (index, sim) -> trainingTargets[index] * sim }
       val weightSum = neighbors.sumOf { it.similarity }
       return if (weightSum > 0.0) weightedSum / weightSum else DEFAULT_PREDICTION
