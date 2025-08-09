@@ -7,12 +7,6 @@ class TextAnalyzer {
    val isTrained: Boolean
       get() = regressionModel.isTrained && featureExtractor.getVocabulary().isNotEmpty()
 
-   constructor()
-
-   constructor(trainingSet: TrainingSet) {
-      train(trainingSet)
-   }
-
    fun train(examples: TrainingSet) {
       val texts = examples.keys
       val targets = examples.values.map { it.toDouble() }.toDoubleArray()

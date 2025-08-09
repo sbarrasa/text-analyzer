@@ -9,7 +9,9 @@ abstract class UseCaseTest {
 
    abstract val trainingSet: TrainingSet
 
-   val model: TextAnalyzer by lazy { TextAnalyzer(trainingSet) }
+   val model: TextAnalyzer by lazy {
+      TextAnalyzer().apply { train(trainingSet) }
+   }
 
    fun assertInRange(
       text: String,
