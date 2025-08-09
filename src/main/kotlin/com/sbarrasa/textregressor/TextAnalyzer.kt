@@ -1,6 +1,6 @@
 package com.sbarrasa.textregressor
 
-class TextRegressor {
+class TextAnalyzer {
    private val featureExtractor = TextFeatureExtractor()
    private val regressionModel = KnnRegressor()
    
