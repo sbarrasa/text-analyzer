@@ -1,4 +1,4 @@
-package com.sbarrasa.textregressor
+package com.sbarrasa.textanalyzer
 
 import mu.KotlinLogging
 import kotlin.test.assertTrue

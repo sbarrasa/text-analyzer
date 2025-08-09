@@ -1,4 +1,4 @@
-package com.sbarrasa.textregressor
+package com.sbarrasa.textanalyzer
 
 typealias TrainingSet = Map<String, Number>
 

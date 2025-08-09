@@ -1,4 +1,4 @@
-package com.sbarrasa.textregressor
+package com.sbarrasa.textanalyzer
 
 /**
  * Simple text tokenizer implementation to replace the external smile SimpleTokenizer

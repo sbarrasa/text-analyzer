@@ -1,6 +1,6 @@
-package com.sbarrasa.textregressor.usecases
+package com.sbarrasa.textanalyzer.usecases
 
-import com.sbarrasa.textregressor.UseCaseTest
+import com.sbarrasa.textanalyzer.UseCaseTest
 import kotlin.test.Test
 
 

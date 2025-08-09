@@ -1,4 +1,4 @@
-package com.sbarrasa.textregressor
+package com.sbarrasa.textanalyzer
 
 class TextAnalyzer {
    private val featureExtractor = TextFeatureExtractor()
