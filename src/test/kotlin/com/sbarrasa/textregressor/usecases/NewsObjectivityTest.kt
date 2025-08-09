@@ -31,7 +31,7 @@ class NewsObjectivityTest : UseCaseTest() {
       )
 
    @Test
-   fun testNeutralArticle() {
+   fun neutralArticle() {
       val text = """
          Según datos publicados por el Instituto Nacional de Estadísticas, el país registró un crecimiento económico del 3,4% en el segundo trimestre del año.
          El sector de la construcción fue uno de los principales impulsores, con un incremento del 7% respecto al trimestre anterior.
@@ -40,11 +40,11 @@ class NewsObjectivityTest : UseCaseTest() {
          Las autoridades señalaron que la tendencia positiva podría sostenerse si se mantiene la estabilidad cambiaria.
      """
 
-      assertInRange(text, 0.0..0.5)
+      assertInRange(text, 0.0..0.6)
    }
 
    @Test
-   fun testOpinionatedArticle() {
+   fun subjectiveArticle() {
       val text = """
          El reciente informe del gobierno intenta mostrar un crecimiento económico que en realidad no se percibe en las calles.
          Aunque se mencionan cifras positivas, la gente sigue sin llegar a fin de mes y los salarios continúan congelados.

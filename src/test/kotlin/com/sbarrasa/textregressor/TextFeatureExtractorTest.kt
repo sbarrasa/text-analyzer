@@ -22,7 +22,7 @@ class TextFeatureExtractorTest {
     }
 
     @Test
-    fun testSingleWordOccurrences() {
+    fun getVocabularyTest() {
         val vocabulary = extractor.getVocabulary()
         logger.info("Extracted vocabulary (${vocabulary.size} terms): ${vocabulary.joinToString(", ")}")
 
@@ -36,7 +36,7 @@ class TextFeatureExtractorTest {
     }
 
     @Test
-    fun testBigrams() {
+    fun getVocabularyBigramsTest() {
         val vocabulary = extractor.getVocabulary()
         logger.info("Bigrams en vocabulario: ${vocabulary.filter { it.contains(" ") }}")
 
@@ -46,11 +46,11 @@ class TextFeatureExtractorTest {
     }
 
     @Test
-    fun testLongerPhraseAnalysis() {
+    fun extractFeaturesTest() {
         val longerText = "el mundo es muy hermoso y lleno de oportunidades para aprender"
         val vocabulary = extractor.getVocabulary()
         
-        // Extract features from the longer phrase
+        // Extraer características de la frase más larga
         val features = extractor.extractFeatures(longerText)
         logger.info("Características extraídas de la frase larga: ${features.size} dimensiones")
         
