@@ -2,7 +2,7 @@ package com.sbarrasa.textregressor
 
 class TextRegressor {
    private val featureExtractor = TextFeatureExtractor()
-   private val regressionModel = RegressionModelAdapter()
+   private val regressionModel = KnnRegressor()
    
    val isTrained: Boolean
       get() = regressionModel.isTrained && featureExtractor.getVocabulary().isNotEmpty()
