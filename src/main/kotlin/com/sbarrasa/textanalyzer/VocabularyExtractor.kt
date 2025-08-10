@@ -1,8 +1,8 @@
 package com.sbarrasa.textanalyzer
 
-class VocabularyExtractor {
-   private val tokenizer = SimpleTokenizer()
-
+class VocabularyExtractor(
+   private val tokenizer: Tokenizer = SimpleTokenizer()
+) {
    companion object {
       private const val DEFAULT_MAX_VOCAB_SIZE = 100
    }
@@ -13,7 +13,7 @@ class VocabularyExtractor {
       val frequency = mutableMapOf<String, Int>()
 
       texts.forEach { text ->
-         val tokens = tokenizer.split(text)
+         val tokens = tokenizer.tokenize(text)
          countUnigrams(tokens, frequency)
          countBigrams(tokens, frequency)
       }
@@ -25,15 +25,16 @@ class VocabularyExtractor {
          .sorted()
    }
 
-   private fun countUnigrams(tokens: Array<String>, frequency: MutableMap<String, Int>) {
+   private fun countUnigrams(tokens: List<String>, frequency: MutableMap<String, Int>) {
       tokens.forEach { token ->
          frequency[token] = (frequency[token] ?: 0) + 1
       }
    }
 
-   private fun countBigrams(tokens: Array<String>, frequency: MutableMap<String, Int>) {
-      tokens.asList().windowed(size = 2, step = 1, partialWindows = false).forEach { (a, b) ->
-         val bigram = "$a $b"
+   private fun countBigrams(tokens: List<String>, frequency: MutableMap<String, Int>) {
+      if (tokens.size < 2) return
+      for (i in 0..tokens.size - 2) {
+         val bigram = tokens[i] + " " + tokens[i + 1]
          frequency[bigram] = (frequency[bigram] ?: 0) + 1
       }
    }

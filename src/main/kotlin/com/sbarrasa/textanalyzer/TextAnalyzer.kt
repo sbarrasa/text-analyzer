@@ -1,7 +1,7 @@
 package com.sbarrasa.textanalyzer
 
 class TextAnalyzer {
-   private val featureExtractor = TextFeatureExtractor()
+   private val featureExtractor = FeatureExtractor()
    private val regressionModel = KnnRegressor()
 
    val isTrained: Boolean

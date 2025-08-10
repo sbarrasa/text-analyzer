@@ -4,10 +4,10 @@ import kotlin.test.Test
 import kotlin.test.assertTrue
 import mu.KotlinLogging
 
-class TextFeatureExtractorTest {
+class FeatureExtractorTest {
     companion object {
         private val logger = KotlinLogging.logger {}
-        val extractor = TextFeatureExtractor()
+        val extractor = FeatureExtractor()
         val texts = listOf(
             "hola mundo",
             "hola universo", 
