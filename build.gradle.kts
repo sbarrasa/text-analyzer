@@ -14,6 +14,7 @@ dependencies {
    // Apache Lucene for text analysis
    implementation("org.apache.lucene:lucene-core:9.8.0")
    implementation("org.apache.lucene:lucene-analysis-common:9.8.0")
+   implementation("org.apache.lucene:lucene-queries:9.8.0")
    
    // Logging - Kotlin logging (wraps SLF4J with Kotlin-friendly API)
    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")

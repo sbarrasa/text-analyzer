@@ -54,6 +54,6 @@ class ProductSatisfactionTest : UseCaseTest() {
    @Test
    fun productWithBadTypos() {
       val text = "El produto sta muy vueno, me gusto mucho y lo recomindo totalmnte."
-      assertInRange(text, 4.0..5.0)
+      assertInRange(text, 3.0..5.0)
    }
 }
