@@ -27,3 +27,5 @@ class LevenshteinDistance(val source: String, val target: String) {
       return dp[len1][len2]
    }
 }
+
+fun String.levenshteinDistance(other: String) = LevenshteinDistance(this, other).calc()

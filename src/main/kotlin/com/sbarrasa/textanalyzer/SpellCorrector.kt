@@ -18,10 +18,10 @@ class SpellCorrector(
    fun findBestMatch(token: String): String {
       if (token.isBlank()) return token
 
-      val lowercaseToken = token.lowercase()
-      val tokenLength = lowercaseToken.length
+      val normalizedToken = token.lowercase()
+      val tokenLength = normalizedToken.length
 
-      if (lowercaseToken in vocabularySet) return lowercaseToken
+      if (normalizedToken in vocabularySet) return normalizedToken
 
       val maxAllowedDistance = calculateMaxAllowedDistance(tokenLength)
 
@@ -31,7 +31,7 @@ class SpellCorrector(
       for (candidate in vocabularySet) {
          if (!isLengthCompatible(tokenLength, candidate.length)) continue
 
-         val distance = LevenshteinDistance(lowercaseToken, candidate).calc()
+         val distance = normalizedToken.levenshteinDistance(candidate)
          if (distance <= maxAllowedDistance && distance < minDistance) {
             minDistance = distance
             bestMatch = candidate
