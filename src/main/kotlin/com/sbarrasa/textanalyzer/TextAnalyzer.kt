@@ -1,10 +1,11 @@
 package com.sbarrasa.textanalyzer
 
+import com.sbarrasa.textanalyzer.lucene.LuceneTextSearchEngine
+
 typealias TrainingSet = Map<String, Number>
 
 class TextAnalyzer(
-   private val engine: SimilarityEngine = LuceneSimilarityEngine(),
-   private val exactMatcher: ExactMatcher = LuceneExactMatcher(),
+   private val searchEngine: TextSearchEngine = LuceneTextSearchEngine(),
    private val aggregator: ScoreAggregator = WeightedScoreAggregator(),
    private val preprocessor: Preprocessor = IdentityPreprocessor(),
    private val kNeighbors: Int = 10
@@ -21,8 +22,7 @@ class TextAnalyzer(
       val examples = examples.map { (t, s) -> Example(preprocessor.normalize(t), s.toDouble()) }
       avgScore = examples.map { it.score }.average().takeIf { !it.isNaN() } ?: 0.0
 
-      exactMatcher.train(examples)
-      engine.train(examples)
+      searchEngine.train(examples)
 
       isTrained = true
    }
@@ -33,14 +33,13 @@ class TextAnalyzer(
 
       val q = preprocessor.normalize(text)
 
-      exactMatcher.find(q)?.let { return it }
+      searchEngine.findExact(q)?.let { return it }
 
-      val neighbors = engine.find(q, kNeighbors)
+      val neighbors = searchEngine.find(q, kNeighbors)
       return aggregator.aggregate(neighbors, avgScore)
    }
 
    override fun close() {
-      (engine as? AutoCloseable)?.close()
-      (exactMatcher as? AutoCloseable)?.close()
+      (searchEngine as? AutoCloseable)?.close()
    }
 }
