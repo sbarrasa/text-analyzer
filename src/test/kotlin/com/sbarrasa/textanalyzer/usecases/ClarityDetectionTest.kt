@@ -37,7 +37,7 @@ class ClarityDetectionTest : UseCaseTest() {
             aunque también existe la posibilidad de que algún componente externo esté interfiriendo.
         """
 
-      assertInRange(text, 0.0..0.7)
+      assertInRange(text, 0.0..0.5)
    }
 
 

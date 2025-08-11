@@ -43,7 +43,7 @@ class PriorityDetectionTest : UseCaseTest() {
          puede responder cuando tenga tiempo. Muchas gracias.
         """
 
-      assertInRange(text, 0.0..1.7)
+      assertInRange(text, 0.0..1.0)
    }
 
    @Test
