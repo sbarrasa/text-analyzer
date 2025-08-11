@@ -23,32 +23,35 @@ class FeatureExtractorTest {
 
     @Test
     fun getVocabularyTest() {
-        val vocabulary = extractor.getVocabulary()
-        logger.info("Extracted vocabulary (${vocabulary.size} terms): ${vocabulary.joinToString(", ")}")
+        val vocabulary = extractor.vocabulary
+        logger.info(
+            """Extracted vocabulary (${vocabulary.size} 
+            terms): ${vocabulary.joinToString(", ")}"""
+        )
 
         assertTrue(vocabulary.isNotEmpty())
 
         assertTrue(vocabulary.contains("hola"))
-        assertTrue(vocabulary.contains("mundo"))
-        assertTrue(vocabulary.contains("universo"))
+        assertTrue(vocabulary.contains("mund"))
+        assertTrue(vocabulary.contains("univers"))
         assertTrue(vocabulary.contains("paz"))
-        assertTrue(vocabulary.contains("hermoso"))
+        assertTrue(vocabulary.contains("hermos"))
     }
 
     @Test
     fun getVocabularyBigramsTest() {
-        val vocabulary = extractor.getVocabulary()
+        val vocabulary = extractor.vocabulary
         logger.info("Bigrams en vocabulario: ${vocabulary.filter { it.contains(" ") }}")
 
-        assertTrue(vocabulary.contains("hola mundo"))
-        assertTrue(vocabulary.contains("hola universo"))
+        assertTrue(vocabulary.contains("hola mund"))
+        assertTrue(vocabulary.contains("hola univers"))
         assertTrue(vocabulary.contains("paz mundial"))
     }
 
     @Test
     fun extractFeaturesTest() {
         val longerText = "el mundo es muy hermoso y lleno de oportunidades para aprender"
-        val vocabulary = extractor.getVocabulary()
+        val vocabulary = extractor.vocabulary
         
         // Extraer características de la frase más larga
         val features = extractor.extractFeatures(longerText)
@@ -57,9 +60,9 @@ class FeatureExtractorTest {
         val hasFeatures = features.any { it > 0.0 }
         assertTrue(hasFeatures)
         
-        assertTrue(vocabulary.contains("mundo"))
-        assertTrue(vocabulary.contains("hermoso"))
-        assertTrue(vocabulary.contains("oportunidades"))
+        assertTrue(vocabulary.contains("mund"))
+        assertTrue(vocabulary.contains("hermos"))
+        assertTrue(vocabulary.contains("oportunidad"))
     }
 
 }

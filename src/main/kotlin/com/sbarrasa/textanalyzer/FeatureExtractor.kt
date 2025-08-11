@@ -1,45 +1,78 @@
 package com.sbarrasa.textanalyzer
 
-class FeatureExtractor(
-   private val tokenizer: Tokenizer = SimpleTokenizer(),
-   private val ngramGenerator: NgramGenerator = SimpleNgramGenerator()
-) {
+import org.apache.lucene.analysis.Analyzer
+import org.apache.lucene.analysis.es.SpanishAnalyzer
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute
+import java.io.StringReader
 
-   private val vocabularyExtractor = VocabularyExtractor()
-
-   private var vocabulary: List<String> = emptyList()
+class FeatureExtractor {
+   private val analyzer: Analyzer = SpanishAnalyzer()
+   var vocabulary: List<String> = emptyList()
+      private set
    private var termIndex: Map<String, Int> = emptyMap()
-   private var spellCorrector: SpellCorrector? = null
 
    fun build(texts: Collection<String>) {
-      vocabulary = vocabularyExtractor.build(texts)
+      val allTerms = mutableSetOf<String>()
+      
+      texts.forEach { text ->
+         val tokens = analyzeText(text)
+         allTerms.addAll(tokens)
+         
+         // Add bigrams
+         val bigrams = generateBigrams(tokens)
+         allTerms.addAll(bigrams)
+      }
+      
+      vocabulary = allTerms.sorted()
       termIndex = vocabulary.withIndex().associate { (i, term) -> term to i }
-      spellCorrector = SpellCorrector(vocabulary)
    }
 
    fun extractFeatures(text: String): DoubleArray {
       ensureVocabularyBuilt()
-
-      val tokens = tokenizer.tokenize(text)
+      
       val featureVector = DoubleArray(vocabulary.size)
-
+      val tokens = analyzeText(text)
+      
+      // Count unigrams
       tokens.forEach { token ->
-         val corrected = spellCorrector?.findBestMatch(token) ?: token
-         incrementIfExists(corrected, featureVector)
+         incrementIfExists(token, featureVector)
       }
-
-      val bigrams = ngramGenerator.generate(tokens, 2..2)
-      bigrams.forEach { ngram ->
-         incrementIfExists(ngram, featureVector)
+      
+      // Count bigrams
+      val bigrams = generateBigrams(tokens)
+      bigrams.forEach { bigram ->
+         incrementIfExists(bigram, featureVector)
       }
-
+      
       return featureVector
    }
 
    fun extractFeaturesMatrix(texts: Collection<String>): Array<DoubleArray> =
       texts.map { extractFeatures(it) }.toTypedArray()
 
-   fun getVocabulary(): List<String> = vocabulary
+   private fun analyzeText(text: String): List<String> {
+      val tokens = mutableListOf<String>()
+      val tokenStream = analyzer.tokenStream("content", StringReader(text))
+      val termAttr = tokenStream.addAttribute(CharTermAttribute::class.java)
+      
+      try {
+         tokenStream.reset()
+         while (tokenStream.incrementToken()) {
+            tokens.add(termAttr.toString())
+         }
+         tokenStream.end()
+      } finally {
+         tokenStream.close()
+      }
+      
+      return tokens
+   }
+   
+   private fun generateBigrams(tokens: List<String>): List<String> {
+      if (tokens.size < 2) return emptyList()
+      
+      return tokens.zipWithNext { a, b -> "$a $b" }
+   }
 
    private fun ensureVocabularyBuilt() {
       if (vocabulary.isEmpty()) {

@@ -5,7 +5,7 @@ class TextAnalyzer {
    private val regressionModel = KnnRegressor()
 
    val isTrained: Boolean
-      get() = regressionModel.isTrained && featureExtractor.getVocabulary().isNotEmpty()
+      get() = regressionModel.isTrained && featureExtractor.vocabulary.isNotEmpty()
 
    fun train(examples: TrainingSet) {
       val texts = examples.keys

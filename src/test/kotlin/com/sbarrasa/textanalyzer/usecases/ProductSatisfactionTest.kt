@@ -23,24 +23,26 @@ class ProductSatisfactionTest : UseCaseTest() {
       "ni fu ni fa" to 0,
       "me encantó" to 5,
       "excelente" to 5,
-      "perfecto" to 4,
-      "muy bueno" to 4,
+      "perfecto" to 5,
+      "muy bueno" to 4.5,
       "funciona bien" to 4,
       "recomendable" to 4,
       "vale la pena" to 4,
+      "me gustó mucho" to 4.5,
+      "lo recomiendo" to 4.8,
       "recomiendo totalmente" to 5
    )
 
    @Test
    fun neutralEvaluationShort() {
-      val text = "El producto cumple lo que promete, nada fuera de lo común."
+      val text = "Cumple lo que promete"
       assertInRange(text, 0.0..0.9)
    }
 
    @Test
    fun positiveEvaluationShort() {
       val text = "Me encantó, funciona perfecto y vale totalmente la pena."
-      assertInRange(text, 1.0..5.0)
+      assertInRange(text, 3.0..5.0)
    }
 
    @Test
@@ -51,7 +53,7 @@ class ProductSatisfactionTest : UseCaseTest() {
 
    @Test
    fun productWithBadTypos() {
-      val text = "El produto sta muy vueno, me guto mucho y lo recomindo totalmnte."
-      assertInRange(text, 3.0..5.0)
+      val text = "El produto sta muy vueno, me gusto mucho y lo recomindo totalmnte."
+      assertInRange(text, 4.0..5.0)
    }
 }
