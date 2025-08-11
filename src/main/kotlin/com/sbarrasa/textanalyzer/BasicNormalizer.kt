@@ -1,14 +1,14 @@
 package com.sbarrasa.textanalyzer
 
 class BasicNormalizer(
-    private val lowercase: Boolean = true,
-    private val trimWhitespace: Boolean = true,
-    private val collapseWhitespace: Boolean = true,
-    private val stripPunctuation: Boolean = false
+    var lowercase: Boolean = true,
+    var trimWhitespace: Boolean = true,
+    var collapseWhitespace: Boolean = true,
+    var stripPunctuation: Boolean = false
 ) : Normalizer {
 
     private val whitespaceRegex = "\\s+".toRegex()
-    private val punctuationRegex = "[\\p{Punct}]".toRegex()
+    private val punctuationRegex = "\\p{Punct}".toRegex()
 
     override fun normalize(text: String): String {
         var t = text
