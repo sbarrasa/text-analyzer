@@ -1,5 +1,6 @@
 package com.sbarrasa.textanalyzer
 
+import org.apache.lucene.analysis.Analyzer
 import org.apache.lucene.analysis.es.SpanishAnalyzer
 import org.apache.lucene.document.Document
 import org.apache.lucene.document.Field
@@ -24,7 +25,7 @@ class TextAnalyzer {
       const val MAX_RESULTS = 10
    }
 
-   private val analyzer = SpanishAnalyzer()
+   private val analyzer: Analyzer = SpanishAnalyzer()
    private val directory = ByteBuffersDirectory()
    private var indexSearcher: IndexSearcher? = null
    private var indexReader: DirectoryReader? = null
