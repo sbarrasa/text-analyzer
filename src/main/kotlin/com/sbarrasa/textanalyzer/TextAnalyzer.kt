@@ -1,53 +1,29 @@
 package com.sbarrasa.textanalyzer
 
-import org.apache.lucene.analysis.Analyzer
-import org.apache.lucene.analysis.es.SpanishAnalyzer
-import org.apache.lucene.document.*
-import org.apache.lucene.index.IndexWriter
-import org.apache.lucene.index.IndexWriterConfig
-import org.apache.lucene.index.Term
-import org.apache.lucene.queries.mlt.MoreLikeThis
-import org.apache.lucene.search.*
-import org.apache.lucene.store.ByteBuffersDirectory
-import java.io.StringReader
-import kotlin.math.min
-
 typealias TrainingSet = Map<String, Number>
 
-class TextAnalyzer : AutoCloseable {
-   private companion object {
-      const val FIELD_CONTENT = "content"
-      const val FIELD_CONTENT_EXACT = "content_exact"
-      const val FIELD_SCORE = "score"
-      const val MAX_RESULTS = 10
-   }
+class TextAnalyzer(
+   private val engine: SimilarityEngine = LuceneSimilarityEngine(),
+   private val exactMatcher: ExactMatcher = LuceneExactMatcher(),
+   private val aggregator: ScoreAggregator = WeightedScoreAggregator(),
+   private val preprocessor: Preprocessor = IdentityPreprocessor(),
+   private val kNeighbors: Int = 10
+) : AutoCloseable {
 
-   private val analyzer: Analyzer = SpanishAnalyzer()
-   private val directory = ByteBuffersDirectory()
-   private val indexWriter = IndexWriter(directory, IndexWriterConfig(analyzer))
-   private val searcherManager = SearcherManager(indexWriter, null)
+   var isTrained = false
+      private set
 
-   private var avgScore: Double = 0.0
+   private var avgScore = 0.0
 
-   var isTrained: Boolean = false
-      private set 
-   
    fun train(examples: TrainingSet) {
       require(examples.isNotEmpty()) { "Training set cannot be empty" }
 
-      indexWriter.deleteAll()
-      var sum = 0.0
-      var count = 0
+      val examples = examples.map { (t, s) -> Example(preprocessor.normalize(t), s.toDouble()) }
+      avgScore = examples.map { it.score }.average().takeIf { !it.isNaN() } ?: 0.0
 
-      examples.forEach { (text, score) ->
-         indexWriter.addDocument(buildDocument(text, score.toDouble()))
-         sum += score.toDouble()
-         count++
-      }
-      indexWriter.commit()
-      searcherManager.maybeRefreshBlocking()
+      exactMatcher.train(examples)
+      engine.train(examples)
 
-      avgScore = if (count > 0) sum / count else 0.0
       isTrained = true
    }
 
@@ -55,72 +31,16 @@ class TextAnalyzer : AutoCloseable {
       check(isTrained) { "Model must be trained before analysis." }
       require(text.isNotBlank()) { "Input text must not be blank." }
 
-      val searcher: IndexSearcher = searcherManager.acquire()
-      return try {
-         val exact = searcher.search(TermQuery(Term(FIELD_CONTENT_EXACT, text)), 1)
-         if (exact.totalHits.value > 0L) {
-            return readScore(searcher, exact.scoreDocs[0])
-         }
+      val q = preprocessor.normalize(text)
 
-         val mlt = MoreLikeThis(searcher.indexReader).apply {
-            analyzer = this@TextAnalyzer.analyzer
-            fieldNames = arrayOf(FIELD_CONTENT)
-            minTermFreq = 1
-            minDocFreq = 1
-            maxQueryTerms = 15
-            minWordLen = 3
-            maxWordLen = 50
-         }
+      exactMatcher.find(q)?.let { return it }
 
-         val query = mlt.like(FIELD_CONTENT, StringReader(text))
-         val limit = min(MAX_RESULTS, searcher.indexReader.numDocs())
-         val topDocs: TopDocs = searcher.search(query, limit)
-
-         if (topDocs.scoreDocs.isEmpty()) avgScore
-         else weightedAverage(topDocs.scoreDocs, searcher)
-      } catch (_: Exception) {
-         avgScore
-      } finally {
-         searcherManager.release(searcher)
-      }
+      val neighbors = engine.find(q, kNeighbors)
+      return aggregator.aggregate(neighbors, avgScore)
    }
-
-   private fun weightedAverage(scoreDocs: Array<ScoreDoc>, searcher: IndexSearcher): Double {
-      var weightedSum = 0.0
-      var total = 0.0
-      for (sd in scoreDocs) {
-         val s = readScore(searcher, sd)
-         val w = sd.score.toDouble()
-         val w2 = w * w
-         if (w2 > 0) {
-            weightedSum += s * w2
-            total += w2
-         }
-      }
-      
-      val result = if (total > 0.0) weightedSum / total else avgScore
-      
-      // Apply scaling factor only for results in the problematic range that affects lowPriority test
-      val scalingFactor = if (result in 1.8..2.0) 0.5 else 1.0
-      
-      return result * scalingFactor
-   }
-
-   private fun readScore(searcher: IndexSearcher, sd: ScoreDoc): Double {
-      val doc = searcher.indexReader.storedFields().document(sd.doc, setOf(FIELD_SCORE))
-      return doc.getField(FIELD_SCORE)?.numericValue()?.toDouble() ?: 0.0
-   }
-
-   private fun buildDocument(text: String, score: Double): Document =
-      Document().apply {
-         add(TextField(FIELD_CONTENT, text, Field.Store.NO))
-         add(StringField(FIELD_CONTENT_EXACT, text, Field.Store.NO))
-         add(StoredField(FIELD_SCORE, score))
-      }
 
    override fun close() {
-      searcherManager.close()
-      indexWriter.close()
-      directory.close()
+      (engine as? AutoCloseable)?.close()
+      (exactMatcher as? AutoCloseable)?.close()
    }
 }
