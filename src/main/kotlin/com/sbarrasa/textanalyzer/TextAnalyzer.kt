@@ -107,7 +107,7 @@ class TextAnalyzer : AutoCloseable {
    }
 
    private fun readScore(searcher: IndexSearcher, sd: ScoreDoc): Double {
-      val doc = searcher.doc(sd.doc)
+      val doc = searcher.indexReader.storedFields().document(sd.doc, setOf(FIELD_SCORE))
       return doc.getField(FIELD_SCORE)?.numericValue()?.toDouble() ?: 0.0
    }
 
