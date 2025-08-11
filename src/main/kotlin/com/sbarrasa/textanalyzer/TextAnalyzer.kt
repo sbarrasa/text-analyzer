@@ -11,7 +11,7 @@ class TextAnalyzer {
       val texts = examples.keys
       val targets = examples.values.map { it.toDouble() }.toDoubleArray()
 
-      featureExtractor.buildVocabulary(texts)
+      featureExtractor.build(texts)
       val features = featureExtractor.extractFeaturesMatrix(texts)
 
       regressionModel.train(features, targets)

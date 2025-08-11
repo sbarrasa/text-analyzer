@@ -7,7 +7,7 @@ class VocabularyExtractor(
       private const val DEFAULT_MAX_VOCAB_SIZE = 100
    }
 
-   fun buildVocabulary(texts: Collection<String>, maxSize: Int = DEFAULT_MAX_VOCAB_SIZE): List<String> {
+   fun build(texts: Collection<String>, maxSize: Int = DEFAULT_MAX_VOCAB_SIZE): List<String> {
       if (texts.isEmpty()) return emptyList()
 
       val frequency = mutableMapOf<String, Int>()
@@ -33,7 +33,7 @@ class VocabularyExtractor(
 
    private fun countBigrams(tokens: List<String>, frequency: MutableMap<String, Int>) {
       if (tokens.size < 2) return
-      for (i in 0..tokens.size - 2) {
+      for (i in 0..(tokens.size - 2)) {
          val bigram = tokens[i] + " " + tokens[i + 1]
          frequency[bigram] = (frequency[bigram] ?: 0) + 1
       }

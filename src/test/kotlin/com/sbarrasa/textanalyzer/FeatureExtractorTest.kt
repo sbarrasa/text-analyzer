@@ -1,8 +1,8 @@
 package com.sbarrasa.textanalyzer
 
+import mu.KotlinLogging
 import kotlin.test.Test
 import kotlin.test.assertTrue
-import mu.KotlinLogging
 
 class FeatureExtractorTest {
     companion object {
@@ -17,7 +17,7 @@ class FeatureExtractorTest {
         )
         
         init {
-          extractor.buildVocabulary(texts)
+          extractor.build(texts)
         }
     }
 

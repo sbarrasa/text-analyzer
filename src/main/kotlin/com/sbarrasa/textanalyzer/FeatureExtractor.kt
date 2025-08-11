@@ -11,8 +11,8 @@ class FeatureExtractor(
    private var termIndex: Map<String, Int> = emptyMap()
    private var spellCorrector: SpellCorrector? = null
 
-   fun buildVocabulary(texts: Collection<String>) {
-      vocabulary = vocabularyExtractor.buildVocabulary(texts)
+   fun build(texts: Collection<String>) {
+      vocabulary = vocabularyExtractor.build(texts)
       termIndex = vocabulary.withIndex().associate { (i, term) -> term to i }
       spellCorrector = SpellCorrector(vocabulary)
    }

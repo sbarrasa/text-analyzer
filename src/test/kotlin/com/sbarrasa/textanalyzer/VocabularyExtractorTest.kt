@@ -1,16 +1,15 @@
 package com.sbarrasa.textanalyzer
 
+import mu.KotlinLogging
 import kotlin.test.Test
 import kotlin.test.assertTrue
-import kotlin.test.assertEquals
-import mu.KotlinLogging
 
 class VocabularyExtractorTest {
     
     private val logger = KotlinLogging.logger {}
     
     @Test
-    fun buildVocabularyTest() {
+    fun buildTest() {
         val extractor = VocabularyExtractor()
         val texts = listOf(
             "hola mundo",
@@ -19,7 +18,7 @@ class VocabularyExtractorTest {
             "el mundo es hermoso"
         )
         
-        val vocabulary = extractor.buildVocabulary(texts)
+        val vocabulary = extractor.build(texts)
         
         logger.debug("Generated vocabulary (${vocabulary.size} terms): ${vocabulary.joinToString(", ")}")
         
@@ -31,7 +30,7 @@ class VocabularyExtractorTest {
     }
     
     @Test
-    fun buildVocabularyBigramsTest() {
+    fun buildBigramsTest() {
         val extractor = VocabularyExtractor()
         val texts = listOf(
             "hola mundo feliz",
@@ -39,7 +38,7 @@ class VocabularyExtractorTest {
             "paz mundial eterna"
         )
         
-        val vocabulary = extractor.buildVocabulary(texts)
+        val vocabulary = extractor.build(texts)
         val bigrams = vocabulary.filter { it.contains(" ") }
         
         logger.debug("Bigrams found: ${bigrams.joinToString(", ")}")
@@ -51,15 +50,15 @@ class VocabularyExtractorTest {
     }
     
     @Test
-    fun buildVocabularyEmptyInputTest() {
+    fun buildEmptyInputTest() {
         val extractor = VocabularyExtractor()
-        val vocabulary = extractor.buildVocabulary(emptyList())
+        val vocabulary = extractor.build(emptyList())
         
         assertTrue(vocabulary.isEmpty(), "Empty input should produce empty vocabulary")
     }
     
     @Test
-    fun buildVocabularyFrequencyOrderingTest() {
+    fun buildFrequencyOrderingTest() {
         val extractor = VocabularyExtractor()
         val texts = listOf(
             "palabra palabra palabra",
@@ -67,7 +66,7 @@ class VocabularyExtractorTest {
             "tercera vez"
         )
         
-        val vocabulary = extractor.buildVocabulary(texts)
+        val vocabulary = extractor.build(texts)
         
         logger.debug("Vocabulary ordered by frequency: ${vocabulary.joinToString(", ")}")
         
