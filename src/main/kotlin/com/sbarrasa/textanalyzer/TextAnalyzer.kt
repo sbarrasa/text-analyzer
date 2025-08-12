@@ -2,12 +2,9 @@ package com.sbarrasa.textanalyzer
 
 import com.sbarrasa.textanalyzer.lucene.LuceneTextSearchEngine
 
-typealias TrainingSet = Map<String, Number>
-
 class TextAnalyzer(
    private val searchEngine: TextSearchEngine = LuceneTextSearchEngine(),
-   private val aggregator: ScoreAggregator = WeightedScoreAggregator(),
-   private val preprocessor: Preprocessor = IdentityPreprocessor(),
+   private val aggregator: ScoreAggregator = ScoreAggregator(),
    private val kNeighbors: Int = 10
 ) : AutoCloseable {
 
@@ -16,11 +13,11 @@ class TextAnalyzer(
 
    private var avgScore = 0.0
 
-   fun train(examples: TrainingSet) {
-      require(examples.isNotEmpty()) { "Training set cannot be empty" }
+   fun train(trainingSet: TrainingSet) {
+      require(trainingSet.isNotEmpty()) { "Training set cannot be empty" }
 
-      val examples = examples.map { (t, s) -> Example(preprocessor.normalize(t), s.toDouble()) }
-      avgScore = examples.map { it.score }.average().takeIf { !it.isNaN() } ?: 0.0
+      val examples = trainingSet.toExampleList()
+      avgScore = examples.compute()
 
       searchEngine.train(examples)
 
@@ -31,11 +28,9 @@ class TextAnalyzer(
       check(isTrained) { "Model must be trained before analysis." }
       require(text.isNotBlank()) { "Input text must not be blank." }
 
-      val q = preprocessor.normalize(text)
+      searchEngine.findExact(text)?.let { return it }
 
-      searchEngine.findExact(q)?.let { return it }
-
-      val neighbors = searchEngine.find(q, kNeighbors)
+      val neighbors = searchEngine.find(text, kNeighbors)
       return aggregator.aggregate(neighbors, avgScore)
    }
 
