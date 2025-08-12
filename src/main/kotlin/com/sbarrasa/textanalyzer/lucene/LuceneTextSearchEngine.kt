@@ -37,7 +37,6 @@ class LuceneTextSearchEngine(
    private var avgScore: Double = 0.0
 
    override fun train(trainingSet: TrainingSet) {
-      // promedio simple como valor por defecto
       avgScore = trainingSet.values.map { it.toDouble() }
          .average()
          .takeIf { !it.isNaN() } ?: 0.0
