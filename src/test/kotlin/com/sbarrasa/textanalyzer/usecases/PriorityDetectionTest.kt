@@ -9,7 +9,7 @@ class PriorityDetectionTest : UseCaseTest() {
 
    override val trainingSet: TrainingSet = mapOf(
       "sin urgencia" to 0,
-      "cuando puedan" to 0.5,
+      "cuando puedan" to 0.0,
       "puede esperar" to 1,
       "prioridad baja" to 1,
       "no urgente" to 0,
