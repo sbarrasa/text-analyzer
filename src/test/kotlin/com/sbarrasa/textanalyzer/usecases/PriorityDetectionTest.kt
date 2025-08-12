@@ -6,7 +6,6 @@ import kotlin.test.Test
 
 class PriorityDetectionTest : UseCaseTest() {
 
-
    override val trainingSet: TrainingSet = mapOf(
       "sin urgencia" to 0,
       "cuando puedan" to 0.0,
@@ -19,12 +18,10 @@ class PriorityDetectionTest : UseCaseTest() {
       "moderada prioridad" to 2,
       "atención necesaria" to 3,
       "es importante" to 3.5,
-      "importante pero no crítico" to 3,
       "se necesita pronto" to 4,
       "urgente" to 5,
       "atención urgente" to 5,
       "prioridad máxima" to 5,
-      "máxima prioridad" to 5,
       "requiere acción inmediata" to 5,
       "de inmediato" to 5,
       "por favor resolver hoy" to 5,

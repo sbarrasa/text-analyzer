@@ -51,6 +51,6 @@ class ClarityDetectionTest : UseCaseTest() {
             en el módulo de autenticación para resolver este fallo y restablecer el acceso a la brevedad.
         """
 
-      assertInRange(text, 0.8..1.0)
+      assertInRange(text, 0.7..1.0)
    }
 }

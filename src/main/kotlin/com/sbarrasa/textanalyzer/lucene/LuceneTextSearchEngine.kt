@@ -4,6 +4,7 @@ import com.sbarrasa.textanalyzer.Example
 import com.sbarrasa.textanalyzer.Neighbor
 import com.sbarrasa.textanalyzer.TextSearchEngine
 import org.apache.lucene.analysis.Analyzer
+import org.apache.lucene.analysis.CharArraySet
 import org.apache.lucene.analysis.es.SpanishAnalyzer
 import org.apache.lucene.document.*
 import org.apache.lucene.index.IndexWriter
@@ -19,7 +20,8 @@ import java.io.StringReader
 import kotlin.math.min
 
 class LuceneTextSearchEngine(
-   private val analyzer: Analyzer = SpanishAnalyzer(),
+   private val analyzer: Analyzer = SpanishAnalyzer(CharArraySet.EMPTY_SET),
+
    private val directory: Directory = ByteBuffersDirectory(),
    indexWriterConfig: IndexWriterConfig = IndexWriterConfig(analyzer),
    similarity: Similarity? = null,
