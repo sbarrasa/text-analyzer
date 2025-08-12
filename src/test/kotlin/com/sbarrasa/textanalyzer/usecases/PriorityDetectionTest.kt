@@ -22,7 +22,7 @@ class PriorityDetectionTest : UseCaseTest() {
       "urgente" to 5,
       "atención urgente" to 5,
       "prioridad máxima" to 5,
-      "requiere acción inmediata" to 5,
+      "acción inmediata" to 5,
       "de inmediato" to 5,
       "por favor resolver hoy" to 5,
       "necesita respuesta rápida" to 4.5,
@@ -64,5 +64,14 @@ class PriorityDetectionTest : UseCaseTest() {
         """
 
       assertInRange(text, 2.8..5.0)
+   }
+
+   @Test
+   fun high2() {
+      val text = """
+            El sistema necesita acción inmediata.
+        """
+
+      assertInRange(text, 4.0..5.0)
    }
 }
