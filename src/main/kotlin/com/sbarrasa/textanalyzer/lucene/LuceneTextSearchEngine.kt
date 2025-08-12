@@ -1,8 +1,8 @@
 package com.sbarrasa.textanalyzer.lucene
 
-import com.sbarrasa.textanalyzer.Example
 import com.sbarrasa.textanalyzer.Neighbor
 import com.sbarrasa.textanalyzer.TextSearchEngine
+import com.sbarrasa.textanalyzer.TrainingSet
 import org.apache.lucene.analysis.Analyzer
 import org.apache.lucene.analysis.CharArraySet
 import org.apache.lucene.analysis.es.SpanishAnalyzer
@@ -21,7 +21,6 @@ import kotlin.math.min
 
 class LuceneTextSearchEngine(
    private val analyzer: Analyzer = SpanishAnalyzer(CharArraySet.EMPTY_SET),
-
    private val directory: Directory = ByteBuffersDirectory(),
    indexWriterConfig: IndexWriterConfig = IndexWriterConfig(analyzer),
    similarity: Similarity? = null,
@@ -35,20 +34,29 @@ class LuceneTextSearchEngine(
    })
    private val manager = SearcherManager(writer, null)
 
-   override fun train(examples: List<Example>) {
+   private var avgScore: Double = 0.0
+
+   override fun train(trainingSet: TrainingSet) {
+      // promedio simple como valor por defecto
+      avgScore = trainingSet.values.map { it.toDouble() }
+         .average()
+         .takeIf { !it.isNaN() } ?: 0.0
+
       writer.deleteAll()
-      for (ex in examples) {
+      for ((text, score) in trainingSet) {
          writer.addDocument(
             Document().apply {
-               add(TextField(fieldContent, ex.text, Field.Store.NO))
-               add(StringField(fieldExact, ex.text, Field.Store.NO))
-               add(StoredField(fieldScore, ex.score))
+               add(TextField(fieldContent, text, Field.Store.NO))
+               add(StringField(fieldExact, text, Field.Store.NO))
+               add(StoredField(fieldScore, score.toDouble()))
             }
          )
       }
       writer.commit()
       manager.maybeRefreshBlocking()
    }
+
+   override fun defaultScore(): Double = avgScore
 
    override fun findExact(queryText: String): Double? {
       val searcher = manager.acquire()

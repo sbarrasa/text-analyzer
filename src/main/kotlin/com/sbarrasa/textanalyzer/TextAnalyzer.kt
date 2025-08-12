@@ -11,16 +11,9 @@ class TextAnalyzer(
    var isTrained = false
       private set
 
-   private var avgScore = 0.0
-
    fun train(trainingSet: TrainingSet) {
       require(trainingSet.isNotEmpty()) { "Training set cannot be empty" }
-
-      val examples = trainingSet.toExampleList()
-      avgScore = examples.compute()
-
-      searchEngine.train(examples)
-
+      searchEngine.train(trainingSet)
       isTrained = true
    }
 
@@ -31,7 +24,7 @@ class TextAnalyzer(
       searchEngine.findExact(text)?.let { return it }
 
       val neighbors = searchEngine.find(text, kNeighbors)
-      return aggregator.aggregate(neighbors, avgScore)
+      return aggregator.aggregate(neighbors, searchEngine.defaultScore())
    }
 
    override fun close() {
