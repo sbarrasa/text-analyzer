@@ -10,17 +10,12 @@ repositories {
 }
 
 dependencies {
-   
-   // Apache Lucene for text analysis
-   implementation("org.apache.lucene:lucene-core:9.8.0")
-   implementation("org.apache.lucene:lucene-analysis-common:9.8.0")
-   implementation("org.apache.lucene:lucene-queries:9.8.0")
-   implementation("org.apache.lucene:lucene-queryparser:9.8.0")
-   implementation("org.apache.lucene:lucene-highlighter:9.8.0")
-   
-   // Apache Commons Math for statistical operations
+
+   implementation("org.apache.opennlp:opennlp-tools:2.3.3")
+   implementation("org.apache.commons:commons-text:1.11.0")
    implementation("org.apache.commons:commons-math3:3.6.1")
-   
+
+
    // Logging - Kotlin logging (wraps SLF4J with Kotlin-friendly API)
    implementation("io.github.microutils:kotlin-logging:3.0.5")
    implementation("ch.qos.logback:logback-classic:1.4.14")
